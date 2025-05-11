@@ -10,6 +10,17 @@ input/
 result/
 *.csv
 
+# 테스트 관련
+test_*/
+tests/
+test_*.py
+*_test.py
+*_tests.py
+test_logs/
+.pytest_cache/
+.coverage
+htmlcov/
+
 # Python 관련
 __pycache__/
 *.py[cod]
