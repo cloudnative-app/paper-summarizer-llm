@@ -1,6 +1,7 @@
 # 로그 파일
 logs/
 *.log
+gemini_responses.log
 
 # 입력 파일
 input/
