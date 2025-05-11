@@ -1,16 +1,22 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 from datetime import datetime
 
+# .env 파일 로드
+load_dotenv()
+
 # 기본 경로 설정
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).resolve().parent
 INPUT_FOLDER_PATH = BASE_DIR / "input"
 OUTPUT_FOLDER_PATH = BASE_DIR / "result"
 PROMPT_FOLDER_PATH = BASE_DIR / "prompts"
 LOG_FOLDER_PATH = BASE_DIR / "logs"
 
 # API 설정
-API_KEY = "AIzaSyB1te7hQnMp6v5nyQgv_F2uUMjTonbSjDs"  # API 키 직접 설정
+API_KEY = os.getenv('GEMINI_API_KEY')
+if not API_KEY:
+    raise ValueError("GEMINI_API_KEY 환경 변수가 설정되지 않았습니다.")
 MODEL_NAME = "gemini-2.0-flash"  # Gemini 2.0 버전 사용
 API_CALL_DELAY = 2  # API 호출 간 지연 시간 (초)
 
