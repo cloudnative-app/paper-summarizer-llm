@@ -10,8 +10,8 @@ import re  # JSON 보정용 정규식 추가
 from config import *
 
 # --- 설정 ---
-# 1. Gemini API 키 설정
-API_KEY = "YOUR_API_KEY"  # 반드시 config.py 또는 환경변수로 설정하세요!
+# config.py에서 import된 값만 사용 (직접 할당 제거)
+# API_KEY, MODEL_NAME, INPUT_FOLDER_PATH, OUTPUT_FOLDER_PATH, API_CALL_DELAY 등은 config.py에서 관리
 
 # 로거 설정
 logger = logging.getLogger(__name__)
