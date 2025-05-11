@@ -11,7 +11,6 @@ from config import *
 
 # --- 설정 ---
 # config.py에서 import된 값만 사용 (직접 할당 제거)
-# API_KEY, MODEL_NAME, INPUT_FOLDER_PATH, OUTPUT_FOLDER_PATH, API_CALL_DELAY 등은 config.py에서 관리
 
 # 로거 설정
 logger = logging.getLogger(__name__)
@@ -29,23 +28,10 @@ except Exception as e:
     exit()
 
 # 2. 사용할 Gemini 모델 설정
-MODEL_NAME = "gemini-2.0-flash"  # Gemini 2.0 버전 사용
-logger.info(f"사용할 Gemini 모델: {MODEL_NAME}")
-
 # 3. PDF 파일이 있는 폴더 경로 설정
-INPUT_FOLDER_PATH = "input" # 현재 스크립트 파일과 같은 위치에 있는 'input' 폴더
-
 # 4. 결과를 저장할 폴더 경로 설정
-OUTPUT_FOLDER_PATH = "result" # 현재 스크립트 파일과 같은 위치에 'result' 폴더 생성 예정
-
-# 5. 결과를 저장할 CSV 파일 경로 (출력 폴더 포함)
-current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-CSV_FILENAME = f"논문분석_결과_{current_time}.csv"
-CSV_FILE_PATH = pathlib.Path(OUTPUT_FOLDER_PATH) / CSV_FILENAME
-
 # 6. API 호출 간 지연 시간 (초) - Rate Limit 방지용
-API_CALL_DELAY = 2 # Flash 모델은 Rate Limit이 더 높을 수 있으므로 짧게 설정 (필요시 조절)
-# --- 설정 끝 ---
+# (위 변수들은 config.py에서 import된 값만 사용)
 
 def create_output_directory(folder_path: str):
     """지정된 경로에 폴더가 없으면 생성합니다."""
