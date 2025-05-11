@@ -5,6 +5,7 @@ gemini_responses.log
 
 # 입력 파일
 input/
+papers/
 *.pdf
 
 # 결과 파일
