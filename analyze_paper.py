@@ -10,39 +10,27 @@ import re  # JSON 보정용 정규식 추가
 from config import *
 
 # --- 설정 ---
-# 1. Gemini API 키 설정 (코드에 직접 입력)
-# !!! 중요: API 키를 코드에 직접 넣는 것은 보안상 권장되지 않습니다. !!!
-# !!! 코드를 공유하거나 버전 관리 시스템(Git 등)에 올릴 때 키가 노출될 수 있습니다. !!!
-# 아래 "YOUR_API_KEY" 부분을 실제 API 키로 교체해주세요.
-API_KEY = "AIzaSyB1te7hQnMp6v5nyQgv_F2uUMjTonbSjDs" # <--- 여기에 실제 Google AI Studio 또는 Cloud Console에서 발급받은 API 키를 입력하세요.
+# 1. Gemini API 키 설정
+API_KEY = "AIzaSyB1te7hQnMp6v5nyQgv_F2uUMjTonbSjDs"
 
-# 로깅 설정
-logging.basicConfig(
-    level=getattr(logging, LOG_LEVEL),
-    format=LOG_FORMAT,
-    handlers=[
-        logging.FileHandler(LOG_FILE, encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
+# 로거 설정
 logger = logging.getLogger(__name__)
 
 if API_KEY == "YOUR_API_KEY":
     logger.error("오류: 코드 내 API_KEY 변수에 실제 Gemini API 키를 입력해주세요.")
     exit()
+
 try:
+    # Gemini API 초기화
     genai.configure(api_key=API_KEY)
-    logger.info("Gemini API 키가 설정되었습니다.")
+    logger.info("Gemini API가 초기화되었습니다.")
 except Exception as e:
-    logger.error(f"오류: API 키 설정 중 문제가 발생했습니다 - {e}")
+    logger.error(f"오류: API 초기화 중 문제가 발생했습니다 - {e}")
     exit()
 
 # 2. 사용할 Gemini 모델 설정
-# 사용자 요청: gemini-2.0-flash. 현재(2025-05-05 기준) 해당 모델명이 공식적으로 확인되지 않아,
-# 가장 유사한 최신 flash 모델인 'gemini-1.5-flash-latest'를 사용합니다.
-# 만약 'gemini-2.0-flash' 모델이 실제로 출시되었다면 아래 모델명을 수정해주세요.
-MODEL_NAME = "gemini-2.0-flash"
-logger.info(f"사용할 Gemini 모델: {MODEL_NAME} (사용자 요청 'gemini-2.0-flash' 기반)")
+MODEL_NAME = "gemini-2.0-flash"  # Gemini 2.0 버전 사용
+logger.info(f"사용할 Gemini 모델: {MODEL_NAME}")
 
 # 3. PDF 파일이 있는 폴더 경로 설정
 INPUT_FOLDER_PATH = "input" # 현재 스크립트 파일과 같은 위치에 있는 'input' 폴더
@@ -80,105 +68,73 @@ def upload_pdf_to_gemini(pdf_path: str) -> genai.types.File | None:
     try:
         pdf_file = genai.upload_file(path=path, display_name=path.name)
         logger.info(f"-> 파일 업로드 완료: {pdf_file.display_name} (URI: {pdf_file.uri})")
+        logger.debug(f"파일 메타데이터: 크기={path.stat().st_size} bytes, 생성일={datetime.fromtimestamp(path.stat().st_ctime)}")
         return pdf_file
     except Exception as e:
-        logger.error(f"오류: '{path.name}' 파일 업로드 중 문제 발생 - {e}")
+        logger.error(f"오류: '{path.name}' 파일 업로드 중 문제 발생 - {e}", exc_info=True)
         if "rate limit" in str(e).lower():
             logger.info("   Rate limit 오류 감지. 잠시 후 재시도합니다...")
             time.sleep(API_CALL_DELAY * 5)
         return None
 
-def analyze_pdf_with_gemini(pdf_file: genai.types.File, prompt: str) -> str | None:
-    """업로드된 PDF 파일과 프롬프트를 사용하여 Gemini API로 분석을 요청합니다."""
-    if not pdf_file:
-        logger.error("오류: 분석을 위한 유효한 PDF 파일 객체가 없습니다.")
+def analyze_pdf_with_gemini(pdf_file: genai.types.File, prompt: str) -> str:
+    """Gemini API를 사용하여 PDF를 분석합니다."""
+    logger.info("Gemini API로 PDF 분석 시작...")
+    try:
+        # Gemini API 호출
+        model = genai.GenerativeModel(MODEL_NAME)
+        logger.debug(f"모델 초기화 완료: {MODEL_NAME}")
+        
+        response = model.generate_content([prompt, pdf_file])
+        logger.info("-> PDF 분석 완료")
+        logger.debug(f"응답 길이: {len(response.text)} 문자")
+        return response.text
+    except Exception as e:
+        logger.error(f"오류: PDF 분석 중 문제 발생 - {e}", exc_info=True)
         return None
 
-    logger.info(f"-> Gemini API 호출 중 (모델: {MODEL_NAME}, 파일: {pdf_file.display_name})...")
+def extract_json(text: str) -> dict:
+    """텍스트에서 JSON 데이터를 추출합니다."""
+    logger.info("JSON 데이터 추출 시작...")
     try:
-        model = genai.GenerativeModel(MODEL_NAME)
-        response = model.generate_content(
-            [prompt, pdf_file],
-            generation_config=genai.types.GenerationConfig(
-                temperature=0.7,  # 응답의 다양성을 위한 temperature 설정
-                top_p=0.8,       # 응답의 일관성을 위한 top_p 설정
-                top_k=40         # 응답의 품질을 위한 top_k 설정
-            )
-        )
-        logger.info(f"-> Gemini API 응답 수신 완료 ({pdf_file.display_name}).")
-
-        if hasattr(response, 'text'):
-            # 응답 텍스트를 UTF-8로 인코딩하여 처리
-            response_text = response.text.encode('utf-8').decode('utf-8')
-            logger.info(f"Gemini 응답 (파일: {pdf_file.display_name}):\n{response_text}")
-            return response_text
-        else:
-            logger.warning(f"경고: '{pdf_file.display_name}' 분석 응답에 텍스트가 없습니다.")
-            if hasattr(response, 'prompt_feedback'): 
-                logger.info(f"   Prompt Feedback: {response.prompt_feedback}")
-            if hasattr(response, 'candidates'):
-                for i, c in enumerate(response.candidates):
-                    if hasattr(c, 'safety_ratings'): 
-                        logger.info(f"   Candidate {i+1} Safety: {c.safety_ratings}")
+        # JSON 형식 찾기
+        json_match = re.search(r'\{.*\}', text, re.DOTALL)
+        if not json_match:
+            logger.warning("JSON 형식을 찾을 수 없습니다.")
             return None
-
+            
+        json_str = json_match.group()
+        logger.debug(f"추출된 JSON 문자열 길이: {len(json_str)} 문자")
+        
+        # JSON 파싱
+        data = json.loads(json_str)
+        logger.info("-> JSON 데이터 추출 완료")
+        return data
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON 파싱 오류: {e}", exc_info=True)
+        return None
     except Exception as e:
-        logger.error(f"오류: '{pdf_file.display_name}' 분석 중 Gemini API 호출 오류 발생 - {e}")
-        if "rate limit" in str(e).lower():
-            logger.info("   Rate limit 오류 감지. 다음 호출 전 지연 시간을 늘립니다...")
-            time.sleep(API_CALL_DELAY * 5)
+        logger.error(f"JSON 추출 중 예기치 않은 오류: {e}", exc_info=True)
         return None
 
 def save_to_csv(file_path: pathlib.Path, data: dict, fieldnames: list):
     """분석 결과를 CSV 파일에 저장합니다."""
-    # 파일 경로는 pathlib.Path 객체로 받음
+    logger.info(f"CSV 파일 저장 시작: {file_path}")
     file_exists = file_path.exists()
     try:
-        # encoding='utf-8-sig' 는 Excel 호환성을 위함
         with open(file_path, 'a', newline='', encoding=CSV_ENCODING) as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             if not file_exists:
                 writer.writeheader()
-                logger.info(f"CSV 파일 '{file_path}' 생성 및 헤더 작성 완료.")
+                logger.info(f"CSV 파일 '{file_path}' 생성 및 헤더 작성 완료")
             row_data = {field: data.get(field, "") for field in fieldnames}
             writer.writerow(row_data)
+            logger.debug(f"저장된 데이터: {row_data}")
+        logger.info("-> CSV 파일 저장 완료")
         return True
     except Exception as e:
-        logger.error(f"오류: CSV 파일 '{file_path}' 저장 중 문제 발생 - {e}")
+        logger.error(f"오류: CSV 파일 '{file_path}' 저장 중 문제 발생 - {e}", exc_info=True)
         return False
-
-def extract_json(text):
-    """JSON 문자열을 추출하고 파싱합니다."""
-    try:
-        # 1. JSON 문자열 추출
-        json_match = re.search(r'```json\s*({[\s\S]*?})\s*```', text)
-        if not json_match:
-            return None
-        
-        json_str = json_match.group(1)
-        
-        # 2. 제어 문자 제거 및 정제
-        json_str = re.sub(r'[\x00-\x1F\x7F-\x9F]', '', json_str)  # 제어 문자 제거
-        json_str = re.sub(r',\s*}', '}', json_str)  # 마지막 쉼표 제거
-        json_str = re.sub(r',\s*]', ']', json_str)  # 배열의 마지막 쉼표 제거
-        
-        # 3. JSON 파싱
-        try:
-            return json.loads(json_str)
-        except json.JSONDecodeError as e:
-            logger.error(f"JSON 파싱 실패: {str(e)}")
-            # 실패한 경우 추가 정제 시도
-            json_str = re.sub(r'[\u0000-\u001F\u007F-\u009F]', '', json_str)
-            json_str = re.sub(r'\\[^"\\/bfnrtu]', '', json_str)
-            try:
-                return json.loads(json_str)
-            except json.JSONDecodeError:
-                logger.error("JSON 파싱 재시도 실패")
-                return None
-            
-    except Exception as e:
-        logger.error(f"JSON 추출 실패: {str(e)}")
-        return None
 
 def load_prompt_template(prompt_file: str = "default_prompt.txt") -> str:
     """프롬프트 템플릿 파일을 로드합니다."""
@@ -201,6 +157,16 @@ def load_analysis_keys(keys_file: str = "default_keys.json") -> list:
         logger.error(f"분석 키 로드 실패: {e}")
         return []
 
+def safe_format_prompt(template: str, **kwargs):
+    """{keys}만 남기고 나머지 { }는 모두 이스케이프"""
+    def replacer(match):
+        if match.group(1).strip() == 'keys':
+            return '{keys}'
+        return '{{' + match.group(1) + '}}'
+    pattern = re.compile(r'\{([^{}]+)\}')
+    safe_template = pattern.sub(replacer, template)
+    return safe_template.format(**kwargs)
+
 def main(pdf_path: str, prompt_template: str, analysis_keys: list) -> dict:
     """메인 실행 함수: PDF 업로드, 분석, 결과 반환 (단일 파일 처리)"""
     pdf_filename = pathlib.Path(pdf_path).name
@@ -217,8 +183,8 @@ def main(pdf_path: str, prompt_template: str, analysis_keys: list) -> dict:
                 result_data[field] = "처리 중단 (업로드 실패)"
         return result_data
 
-    # 프롬프트에 키 목록 삽입
-    prompt = prompt_template.format(keys=json.dumps(analysis_keys, ensure_ascii=False))
+    # 프롬프트에 키 목록 삽입 (중괄호 자동 이스케이프)
+    prompt = safe_format_prompt(prompt_template, keys=json.dumps(analysis_keys, ensure_ascii=False))
     time.sleep(API_CALL_DELAY)
 
     # 2. Gemini API로 분석 요청

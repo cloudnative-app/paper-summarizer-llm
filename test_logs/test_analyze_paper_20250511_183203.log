@@ -1,0 +1,19 @@
+2025-05-11 18:32:03,703 - INFO - [test_analyze_paper.py:33] - === 단일 파일 분석 테스트 시작 ===
+2025-05-11 18:32:03,705 - INFO - [test_analyze_paper.py:38] - 테스트 환경 설정 완료: 입력 폴더=test_input, 출력 폴더=test_result, 로그 폴더=test_logs
+2025-05-11 18:32:03,706 - INFO - [test_analyze_paper.py:48] - 테스트 파일 복사 완료: test_input\A business model template for AI solutions.pdf
+2025-05-11 18:32:03,707 - INFO - [test_analyze_paper.py:58] - 프롬프트 템플릿과 분석 키 로드 완료
+2025-05-11 18:32:03,707 - INFO - [test_analyze_paper.py:61] - 파일 분석 시작: test_input\A business model template for AI solutions.pdf
+2025-05-11 18:32:03,708 - INFO - [analyze_paper.py:67] - 'A business model template for AI solutions.pdf' 파일을 업로드하는 중...
+2025-05-11 18:32:04,455 - DEBUG - [discovery.py:1258] - URL being requested: POST https://generativelanguage.googleapis.com/upload/v1beta/files?key=AIzaSyB1te7hQnMp6v5nyQgv_F2uUMjTonbSjDs&alt=json&uploadType=resumable
+2025-05-11 18:32:07,785 - INFO - [analyze_paper.py:70] - -> 파일 업로드 완료: A business model template for AI solutions.pdf (URI: https://generativelanguage.googleapis.com/v1beta/files/4km83erasyjt)
+2025-05-11 18:32:07,786 - DEBUG - [analyze_paper.py:71] - 파일 메타데이터: 크기=337262 bytes, 생성일=2025-05-11 18:32:03.693939
+2025-05-11 18:32:09,787 - INFO - [analyze_paper.py:82] - Gemini API로 PDF 분석 시작...
+2025-05-11 18:32:09,788 - DEBUG - [analyze_paper.py:86] - 모델 초기화 완료: gemini-2.0-flash
+2025-05-11 18:32:18,671 - INFO - [analyze_paper.py:89] - -> PDF 분석 완료
+2025-05-11 18:32:18,671 - DEBUG - [analyze_paper.py:90] - 응답 길이: 1658 문자
+2025-05-11 18:32:18,672 - INFO - [analyze_paper.py:98] - JSON 데이터 추출 시작...
+2025-05-11 18:32:18,672 - DEBUG - [analyze_paper.py:107] - 추출된 JSON 문자열 길이: 1646 문자
+2025-05-11 18:32:18,672 - INFO - [analyze_paper.py:111] - -> JSON 데이터 추출 완료
+2025-05-11 18:32:18,673 - INFO - [test_analyze_paper.py:65] - 파일 분석 완료
+2025-05-11 18:32:18,673 - DEBUG - [test_analyze_paper.py:66] - 분석 결과: {'논문 제목': 'A Business Model Template for AI Solutions', '핵심 내용': '본 논문은 AI 솔루션의 비즈니스 모델 구성 요소를 설명하는 캔버스를 제시합니다. 스타트업, 스핀오프 및 기존 기업들이 AI 연구와 기술을 상업 제품 및 서비스로 이전함에 따라, AI 엔지니어들은 이러한 벤처의 전체 전략 내에서 자신의 작업을 집중하고 포지셔닝함으로써 이점을 얻을 수 있습니다. 우리는 기존 연구, 9개의 이차 출처 사례, 그리고 우리가 직접 수행한 5개의 사례 연구를 기반으로 AI 솔루션에 대한 비즈니스 모델 캔버스를 설계했습니다. 우리의 연구는 가치 제안의 공통 특성, 회사 세그먼트의 다면 플랫폼, 고객 관계의 자동화된 서비스, 채널의 소셜 네트워크, 핵심 파트너의 투자자, 핵심 활동의 R&D, 핵심 자원의 인적 자원, 수익의 Software-as-a-Service와 같은 비즈니스 모델 캔버스의 각 블록에서 가장 자주 사용되는 요소를 강조합니다.', '비즈니스 모델 캔버스(BMC) 활용 여부': 'Y', 'AI의 특징': '텍스트 생성 능력, 음성 인식, 의사 결정, 언어 간 번역 등 인간의 지능을 필요로 하는 작업을 수행할 수 있는 컴퓨터 시스템의 이론 및 개발', '고객 세그먼트': '비즈니스 고객(B2B)(예: 농업, 보험, 건설, 엔터테인먼트, 자동차 제조, 패션), 소비자 최종 사용자(B2C), 정부, 연구 기관/학계, 개발자', '가치 제안': "최적화, '할 일을 제대로 끝내는 것', 비용 절감, 자동화, 편리성/사용성, 맞춤화, 새로움, 속도, 의사 결정 개선, 디자인, 보안/안전, 브랜드/상태", '채널': '컨퍼런스, 웹사이트, 소셜 네트워크, 모바일 앱, 온라인 상점, 언론, 파트너 판매, 유통업체/벤더', '고객 관계': '자동화된 서비스, 개인 지원, 맞춤화된 서비스, 공동 창조, 커뮤니티, 셀프 서비스', '수익 흐름': '스타트업 투자, Software-as-a-Service(구독료), 라이선스 및 로열티, 제품 판매(일회성 판매), 사용료(종량제), 클릭당 비용', '핵심 자원': '인적 자원, 제품/기술, AI 및 알고리즘, 지적 재산, 데이터 세트, 회사의 핵심 가치', '핵심 활동': 'R&D, 엔지니어링, 제품 개발, 소프트웨어 개발, 마케팅 및 판매, 고객 개발/지원, 운영, 데이터 관리, IT 유지보수/운영, 디자인', '핵심 파트너십': '투자자, 대학 및 연구 기관, 주요 IT 기업(Google, IBM, Microsoft, FB 등), 개발자, 정부, 유통업체, 공급업체', '비용 구조': '인적 자원, 관리(사무실 임대료 등), R&D, 마케팅 및 판매, IT 인프라, 제품 개발, 하드웨어 및 소프트웨어 비용, 라이선스', '추가영역 제시': '사용자 경험, 디자인 및 브랜드/상태가 AI 분야에서 매우 중요하므로 회사 개발 초기 단계에서 엔지니어, 비즈니스 및 디자인 간에 제한된 리소스를 할당해야 합니다.', '비즈니스 캔버스 모델의 틀 변경 여부': 'N', '기타': 'AI 회사가 사업 모델을 사용하는 데 익숙하지 않기 때문에 AI 전문가가 사업 모델을 구성하는 데 사용할 수 있는 간단한 도구를 제공함으로써 이 격차를 해소하는 것을 목표로 합니다.', '오류': ''}
+2025-05-11 18:32:18,673 - INFO - [test_analyze_paper.py:76] - === 단일 파일 분석 테스트 종료 ===

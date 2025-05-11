@@ -1,102 +1,88 @@
-# 논문 분석 및 비즈니스 모델 캔버스 생성기
+# 논문 분석 도구 (Paper Analyzer)
 
-이 프로젝트는 Gemini API를 사용하여 PDF 논문을 분석하고 비즈니스 모델 캔버스(BMC)와 관련된 구조화된 정보를 추출하는 도구입니다.
+이 도구는 PDF 형식의 논문을 자동으로 분석하여 핵심 내용을 추출하고 정리해주는 프로그램입니다. Gemini AI를 활용하여 논문의 주요 내용을 분석하고, 비즈니스 모델 캔버스(BMC) 관점에서 구조화된 정보를 제공합니다.
 
 ## 주요 기능
 
-- PDF 논문 텍스트 추출 및 분석
-- 비즈니스 모델 캔버스 요소 자동 추출
-  - 핵심 파트너십
-  - 핵심 활동
-  - 핵심 자원
-  - 가치 제안
-  - 고객 관계
-  - 채널
-  - 고객 세그먼트
-  - 비용 구조
-  - 수익원
-- 사용자 정의 프롬프트 및 분석 키 지원
-- CSV 형식의 구조화된 출력
-- 분석 결과 시각화
+- PDF 논문 자동 분석
+- 비즈니스 모델 캔버스(BMC) 기반 정보 추출
+- 분석 결과를 CSV 파일로 저장
+- 상세한 로그 기록
 
 ## 설치 방법
 
-1. 저장소 클론:
+1. Python 3.8 이상이 설치되어 있어야 합니다.
+2. 필요한 패키지를 설치합니다:
 ```bash
-git clone https://github.com/yourusername/analyze-paper.git
-cd analyze-paper
-```
-
-2. 가상환경 생성 및 활성화:
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
-```
-
-3. 의존성 설치:
-```bash
-pip install -r requirements.txt
-```
-
-4. Gemini API 키 설정:
-- Google AI Studio에서 API 키를 발급받습니다.
-- `.env` 파일을 생성하고 API 키를 설정합니다:
-```
-GEMINI_API_KEY=your_api_key_here
+pip install google-generativeai
 ```
 
 ## 사용 방법
 
-1. 기본 사용법:
+1. `input` 폴더에 분석하고 싶은 PDF 논문 파일을 넣습니다.
+2. 프로그램을 실행합니다:
 ```bash
-python analyze_paper.py path/to/your/paper.pdf
+python analyze_paper.py
 ```
+3. 분석 결과는 `result` 폴더에 CSV 파일로 저장됩니다.
+4. 로그 파일은 `logs` 폴더에서 확인할 수 있습니다.
 
-2. 사용자 정의 프롬프트 사용:
-```bash
-python analyze_paper.py path/to/your/paper.pdf --prompt "your_custom_prompt.txt"
-```
-
-3. 사용자 정의 분석 키 사용:
-```bash
-python analyze_paper.py path/to/your/paper.pdf --keys "your_custom_keys.txt"
-```
-
-## 출력 예시
+## 폴더 구조
 
 ```
-=== 논문 분석 결과 ===
-제목: [논문 제목]
-저자: [저자명]
-발행일: [발행일]
-
-=== 비즈니스 모델 캔버스 요소 ===
-1. 핵심 파트너십
-   - [파트너십 1]
-   - [파트너십 2]
-
-2. 핵심 활동
-   - [활동 1]
-   - [활동 2]
-
-[... 기타 요소들 ...]
-
-=== 분석 결과가 'output.csv'에 저장되었습니다. ===
+paper-analyzer/
+├── input/          # 분석할 PDF 파일을 넣는 폴더
+├── result/         # 분석 결과가 저장되는 폴더
+├── logs/           # 로그 파일이 저장되는 폴더
+├── prompts/        # 프롬프트 템플릿 파일
+├── analyze_paper.py # 메인 프로그램
+└── config.py       # 설정 파일
 ```
 
-## 프로젝트 구조
+## 설정 방법
 
+1. `config.py` 파일에서 API 키를 설정합니다:
+```python
+API_KEY = "YOUR_API_KEY"  # Google AI Studio에서 발급받은 API 키
 ```
-analyze-paper/
-├── analyze_paper.py      # 메인 스크립트
-├── requirements.txt      # 의존성 목록
-├── README.md            # 프로젝트 문서
-├── prompts/             # 프롬프트 템플릿
-│   └── default_prompt.txt
-└── keys/                # 분석 키 정의
-    └── default_keys.txt
-```
+
+2. 필요한 경우 다음 설정을 변경할 수 있습니다:
+- `MODEL_NAME`: 사용할 Gemini 모델 (기본값: "gemini-2.0-flash")
+- `API_CALL_DELAY`: API 호출 간 지연 시간 (초)
+- `LOG_LEVEL`: 로그 레벨 (DEBUG, INFO, WARNING, ERROR)
+
+## 분석 결과 예시
+
+CSV 파일에는 다음과 같은 정보가 포함됩니다:
+- 논문 제목
+- 핵심 내용
+- 비즈니스 모델 캔버스(BMC) 활용 여부
+- AI의 특징
+- 고객 세그먼트
+- 가치 제안
+- 채널
+- 고객 관계
+- 수익 흐름
+- 핵심 자원
+- 핵심 활동
+- 핵심 파트너십
+- 비용 구조
+- 추가 영역
+- 기타 정보
+
+## 주의사항
+
+1. Google AI Studio에서 API 키를 발급받아야 합니다.
+2. 무료 API 사용량 제한이 있으므로 주의해서 사용해주세요.
+3. PDF 파일은 텍스트가 추출 가능한 형식이어야 합니다.
+
+## 문제 해결
+
+문제가 발생하면 `logs` 폴더의 로그 파일을 확인해주세요. 주요 오류 메시지와 해결 방법:
+
+1. API 키 오류: `config.py`의 API 키가 올바른지 확인
+2. 파일 업로드 실패: PDF 파일이 손상되지 않았는지 확인
+3. 분석 실패: PDF 파일의 텍스트 추출이 가능한지 확인
 
 ## 라이선스
 
@@ -104,11 +90,9 @@ MIT License
 
 ## 기여 방법
 
-1. 이슈 생성
-2. 브랜치 생성
-3. 변경사항 커밋
-4. Pull Request 생성
+1. 이슈를 생성하여 버그를 보고하거나 새로운 기능을 제안해주세요.
+2. Pull Request를 통해 코드 개선을 제안해주세요.
 
-## 문의사항
+## 연락처
 
-이슈를 통해 문의해 주세요. 
+문제가 있거나 도움이 필요하시면 이슈를 생성해주세요. 
