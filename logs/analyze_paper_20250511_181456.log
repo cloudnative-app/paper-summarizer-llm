@@ -1,2 +1,0 @@
-2025-05-11 18:14:56,822 - INFO - [analyze_paper.py:35] - Gemini API 키가 설정되었습니다.
-2025-05-11 18:14:56,822 - INFO - [analyze_paper.py:42] - 사용할 Gemini 모델: gemini-1.5-pro-latest
