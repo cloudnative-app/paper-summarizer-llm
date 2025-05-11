@@ -76,6 +76,7 @@ paper-analyzer/
 ```python
 API_KEY = "YOUR_API_KEY"  # Google AI Studio에서 발급받은 API 키
 ```
+> **보안 주의:** API 키는 절대 analyze_paper.py 등 코드에 직접 입력하지 마세요! 반드시 config.py 또는 환경변수로만 관리하세요.
 
 2. 필요한 경우 다음 설정을 변경할 수 있습니다:
 - `MODEL_NAME`: 사용할 Gemini 모델 (기본값: "gemini-2.0-flash")

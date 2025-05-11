@@ -11,7 +11,7 @@ from config import *
 
 # --- 설정 ---
 # 1. Gemini API 키 설정
-API_KEY = "AIzaSyB1te7hQnMp6v5nyQgv_F2uUMjTonbSjDs"
+API_KEY = "YOUR_API_KEY"  # 반드시 config.py 또는 환경변수로 설정하세요!
 
 # 로거 설정
 logger = logging.getLogger(__name__)
