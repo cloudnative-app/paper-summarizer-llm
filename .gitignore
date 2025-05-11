@@ -1,15 +1,17 @@
 # 로그 파일
 logs/
 *.log
+!logs/.gitkeep
 gemini_responses.log
 
 # 입력 파일
 input/
-papers/
+!input/.gitkeep
 *.pdf
 
 # 결과 파일
 result/
+!result/.gitkeep
 *.csv
 
 # 테스트 관련
